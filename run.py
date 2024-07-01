@@ -12,11 +12,10 @@ CORS(app)
 
 #registrar una ruta asociada a una vista
 app.route('/',methods=['GET'])(index)
-app.route('/api/movies/',methods=['GET'])(get_all_movies)
-app.route('/api/movies/',methods=['POST'])(create_movie)
-app.route('/api/movies/<int:movie_id>', methods=['GET'])(get_movie)
-app.route('/api/movies/<int:movie_id>', methods=['PUT'])(update_movie)
-app.route('/api/movies/<int:movie_id>', methods=['DELETE'])(delete_movie)
+app.route('/api/login/',methods=['POST'])(authenticate)
+app.route('/api/register/',methods=['POST'])(register)
+app.route('/api/validate/<email>', methods=['GET'])(get_user)
+app.route('/api/unregister/<email>', methods=['DELETE'])(unregister)
 
 if __name__ == '__main__':
     app.run(debug=True)

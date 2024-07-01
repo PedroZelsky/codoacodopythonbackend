@@ -16,6 +16,15 @@ def get_user(email):
         return jsonify({'message': 'User not found'}), 404
     return jsonify(user.serialize())
 
+def authenticate():
+    data = request.json
+    user = User.get_user(data['email'])
+    if not user:
+        return jsonify({'message': 'Invalid email'}), 404
+    elif user.password != data['password']:
+        return jsonify({'message': 'Invalid password'}), 404
+    return jsonify({'message': 'Authenticated'})
+
 def register():
     data = request.json
 
@@ -35,7 +44,7 @@ def register():
     return jsonify(response) , 201
 
 
-def delete_user(email):
+def unregister(email):
     user = User.get_user(email)
     if not user:
         return jsonify({'message': 'User not found'}), 404

@@ -12,9 +12,9 @@ class User:
 
     def serialize(self):
         return {
-            'Name':self.id_movie,
-            'Lastname':self.title,
-            'E-mail':self.director
+            'Name':self.name,
+            'Lastname':self.lastname,
+            'E-mail':self.email
         }
 
 
@@ -34,7 +34,7 @@ class User:
     def get_user(email):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT name,lastname,email,password FROM users WHERE email = %s", (email))
+        cursor.execute("SELECT name,lastname,email,password FROM users WHERE email = %s", (email,))
         row = cursor.fetchone()
         cursor.close()
         if row:
@@ -50,13 +50,13 @@ class User:
             cursor.execute("""
                 INSERT INTO users (name, lastname, email, password) VALUES (%s, %s, %s, %s)
             """, (self.name, self.lastname, self.email, self.password))
-        db.commit() #confirmar la accion
+        db.commit() 
         cursor.close()
 
 
     def unregister(self):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("DELETE FROM users WHERE email = %s", (self.email))
+        cursor.execute("DELETE FROM users WHERE email = %s", (self.email,))
         db.commit()
         cursor.close()
