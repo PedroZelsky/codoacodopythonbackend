@@ -1,69 +1,62 @@
 from app.database import get_db
 
-class Movie:
 
-    #contructor
-    def __init__(self,id_movie=None,title=None,director=None,release_date=None,banner=None):
-        self.id_movie = id_movie
-        self.title = title
-        self.director = director
-        self.release_date = release_date
-        self.banner = banner
+class User:
+
+    def __init__(self,name=None,lastname=None,email=None,password=None):
+        self.name = name
+        self.lastname = lastname
+        self.email = email
+        self.password = password
+
 
     def serialize(self):
         return {
-            'id_movie':self.id_movie,
-            'title':self.title,
-            'director':self.director,
-            'release_date':self.release_date.strftime('%Y-%m-%d'),
-            'banner':self.banner,
+            'Name':self.id_movie,
+            'Lastname':self.title,
+            'E-mail':self.director
         }
 
+
     @staticmethod
-    def get_all():
-        #logica de buscar en la base todas las peliculas
+    def get_users():
         db = get_db()
         cursor = db.cursor()
-        query = "SELECT * FROM movies"
+        query = "SELECT name,lastname,email,password FROM users"
         cursor.execute(query)
-        #obtengo resultados
         rows = cursor.fetchall()
-        movies = [Movie(id_movie=row[0], title=row[1], director=row[2], release_date=row[3], banner=row[4]) for row in rows]
-        #cerramos el cursor
+        users = [User(name=row[0], lastname=row[1], email=row[2], password=row[3]) for row in rows]
         cursor.close()
-        return movies
+        return users
 
-    def save(self):
-        db = get_db()
-        cursor = db.cursor()
-        if self.id_movie:
-            cursor.execute("""
-                UPDATE movies SET title = %s, director = %s, release_date = %s, banner = %s
-                WHERE id_movie = %s
-            """, (self.title, self.director, self.release_date, self.banner, self.id_movie))
-        else:
-            cursor.execute("""
-                INSERT INTO movies (title, director, release_date, banner) VALUES (%s, %s, %s, %s)
-            """, (self.title, self.director, self.release_date, self.banner))
-            #voy a obtener el último id generado
-            self.id_movie = cursor.lastrowid
-        db.commit() #confirmar la accion
-        cursor.close()
 
     @staticmethod
-    def get_by_id(movie_id):
+    def get_user(email):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM movies WHERE id_movie = %s", (movie_id,))
+        cursor.execute("SELECT name,lastname,email,password FROM users WHERE email = %s", (email))
         row = cursor.fetchone()
         cursor.close()
         if row:
-            return Movie(id_movie=row[0], title=row[1], director=row[2], release_date=row[3], banner=row[4])
+            return User(name=row[0], lastname=row[1], email=row[2], password=row[3])
         return None
 
-    def delete(self):
+
+    def register(self):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("DELETE FROM movies WHERE id_movie = %s", (self.id_movie,))
+        new_user = self.get_user(self.email)
+        if new_user == None:
+            cursor.execute("""
+                INSERT INTO users (name, lastname, email, password) VALUES (%s, %s, %s, %s)
+            """, (self.name, self.lastname, self.email, self.password))
+        db.commit() #confirmar la accion
+        cursor.close()
+
+
+    def unregister(self):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM users WHERE email = %s", (self.email))
         db.commit()
         cursor.close()
